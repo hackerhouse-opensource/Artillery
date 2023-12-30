@@ -186,6 +186,8 @@ int main()
         return 1;
     }
     printf("WM_RBUTTONDOWN message posted\n");
+    // Sleep for 1 second
+    Sleep(1000);
     // Unhook and unload the DLL
     UnhookWindowsHookEx(hHook);
     FreeLibrary(hDll);
