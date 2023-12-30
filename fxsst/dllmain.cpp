@@ -19,12 +19,10 @@ BOOL APIENTRY DllMain(HMODULE hModule,DWORD ul_reason_for_call,LPVOID lpReserved
         // Create a new console with cmd.exe running
         STARTUPINFO si;
         PROCESS_INFORMATION pi;
-
         ZeroMemory(&si, sizeof(si));
         si.cb = sizeof(si);
         ZeroMemory(&pi, sizeof(pi));
         wchar_t cmd[] = L"cmd.exe";  // non-const wchar_t array
-
         if (!CreateProcess(NULL,   // No module name (use command line)
             cmd,        // Command line
             NULL,           // Process handle not inheritable

