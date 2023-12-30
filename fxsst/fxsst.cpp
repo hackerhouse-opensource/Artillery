@@ -21,7 +21,8 @@
  * 
  * This code will persist a "cmd.exe" which will be present when explorer.exe
  * restarts or the host rebooted. This is a PoC for Artillery which is an AED
- * example to bypass UAC and obtain persistence.
+ * example to bypass UAC and obtain persistence. 
+ * 
  */
 #include "pch.h"
 #include <windows.h>
