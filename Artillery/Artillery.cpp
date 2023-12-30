@@ -13,7 +13,7 @@
  *
  * The Vault7 wiki contains references to privilate escalation modules
  * used by the AED. This is an implementation of "Artillery - UAC Bypass"
- * which is one of four UAC bypasses. 
+ * which is one of several UAC bypasses described in the leak. 
  * 
  * Artillery Utilizes elevated COM object to write to System32 and an 
  * auto-elevated process to execute as administrator. According to the
