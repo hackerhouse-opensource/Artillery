@@ -134,6 +134,7 @@ void ElevatedCopy()
         delete[] szFxsstDllPath;
     CoUninitialize();
 }
+
 extern "C" __declspec(dllexport) LRESULT CALLBACK CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     // increase the DLL reference counter to stop unloading as per Vault7
