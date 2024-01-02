@@ -7,7 +7,7 @@ with other modules and payloads. The purpose is to bypass UAC and a second attac
 to obtain persistence on a host. Artillery utilizes elevated COM object to write to System32 
 and an auto-elevated process to execute as administrator, it can then be combined with a
 FAX DLL injection for explorer.exe for persistence on a host. This UAC bypass and persistence
-has been tested on Windows 7 and Windows Vista.
+has been tested on Windows 7.
 
 ##  License
 
