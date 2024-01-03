@@ -19,7 +19,7 @@
  * auto-elevated process to execute as administrator. According to the
  * wiki this is used for persistence through injection of a FAX DLL to
  * explorer.exe. This UAC bypass (and the persitence) has been tested
- * on Windows 7 and Windows Vista. 
+ * on Windows 7. 
  * 
  */
 #include <windows.h>
